@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Work Sans', sans-serif;
+  --font-display: 'Sora', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --color-ink: #0A0A0A;
+  --color-surface: #151515;
+  --color-border-soft: #262626;
+  --color-paper: #F5F7F6;
+  --color-signal: #17B890;
+  --color-pulse: #E8553D;
+  --color-amber: #E3A008;
+  --color-mist: #A1A1AA;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+@keyframes draw-line {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.grid-paper {
+  background-image:
+    linear-gradient(rgba(23, 184, 144, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 184, 144, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
