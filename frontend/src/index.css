@@ -13,72 +13,400 @@
   --color-pulse: #E8553D;
   --color-amber: #E3A008;
   --color-mist: #A1A1AA;
+  --color-white: #FFFFFF;
+}
+
+/* ── Theme-specific CSS custom properties ────────────── */
+/* Dark mode is the default — @theme values above handle it.
+   Light mode overrides below flip every semantic token. */
+
+:root {
+  --vw-ecg-bg: 10, 10, 10;
+  --vw-particle-rgb: 23, 184, 144;
+  --vw-grid-line: rgba(23, 184, 144, 0.06);
+}
+
+:root.light {
+  --color-ink: #F5F7F6;
+  --color-surface: #FFFFFF;
+  --color-border-soft: #D8DBD9;
+  --color-paper: #0A0A0A;
+  --color-signal: #12A07C;
+  --color-pulse: #D9432C;
+  --color-amber: #CA8E04;
+  --color-mist: #6B7280;
+  color-scheme: light;
+
+  /* Remap text-white to dark text in light mode */
+  --color-white: #111827;
+
+  --vw-ecg-bg: 245, 247, 246;
+  --vw-particle-rgb: 18, 160, 124;
+  --vw-grid-line: rgba(18, 160, 124, 0.08);
 }
 
 body {
-  background-color: var(--color-paper);
+  background-color: var(--color-ink);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 @keyframes draw-line {
-  to { stroke-dashoffset: 0; }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.25;
+  }
 }
 
 @keyframes drift {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes breathe {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+  }
+}
+
+@keyframes ambient-beat {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+
+  10% {
+    transform: scale(1.3);
+    opacity: 0.8;
+  }
+
+  22% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+
+  32% {
+    transform: scale(1.15);
+    opacity: 0.65;
+  }
+
+  44%,
+  100% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.5;
+  }
+
+  80% {
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes drift-up {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.22;
+  }
+
+  90% {
+    opacity: 0.22;
+  }
+
+  100% {
+    transform: translateY(-100vh);
+    opacity: 0;
+  }
 }
 
 @keyframes sweep {
-  from { left: -2px; }
-  to { left: 100%; }
+  from {
+    left: -2px;
+  }
+
+  to {
+    left: 100%;
+  }
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  15% { transform: scale(1.4); }
-  30% { transform: scale(1); }
-  45% { transform: scale(1.25); }
-  60% { transform: scale(1); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  15% {
+    transform: scale(1.4);
+  }
+
+  30% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.25);
+  }
+
+  60% {
+    transform: scale(1);
+  }
 }
 
 @keyframes cuff-pulse {
-  0%, 100% { transform: scaleY(1); }
-  35% { transform: scaleY(0.6); }
-  65% { transform: scaleY(1.2); }
+
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  35% {
+    transform: scaleY(0.6);
+  }
+
+  65% {
+    transform: scaleY(1.2);
+  }
 }
 
 @keyframes bubble-float {
-  0%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-9px); }
-  60% { transform: translateY(2px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(-9px);
+  }
+
+  60% {
+    transform: translateY(2px);
+  }
 }
 
 @keyframes mercury-rise {
-  0% { transform: scaleY(0.7) translateY(5px); }
-  50% { transform: scaleY(1.25) translateY(-5px); }
-  100% { transform: scaleY(1) translateY(0); }
+  0% {
+    transform: scaleY(0.7) translateY(5px);
+  }
+
+  50% {
+    transform: scaleY(1.25) translateY(-5px);
+  }
+
+  100% {
+    transform: scaleY(1) translateY(0);
+  }
 }
 
 .grid-paper {
   background-image:
-    linear-gradient(rgba(23, 184, 144, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(23, 184, 144, 0.06) 1px, transparent 1px);
+    linear-gradient(var(--vw-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--vw-grid-line) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* ── Dashboard Overhaul Animations ──────────────────── */
+
+@keyframes slide-out-right {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 200px;
+  }
+  50% {
+    opacity: 0;
+    transform: translateX(40px);
+    max-height: 200px;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(40px);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+}
+
+@keyframes glow-pulse-signal {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(23, 184, 144, 0);
+  }
+  50% {
+    box-shadow: 0 0 16px 2px rgba(23, 184, 144, 0.15);
+  }
+}
+
+@keyframes glow-pulse-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(232, 85, 61, 0);
+  }
+  50% {
+    box-shadow: 0 0 18px 3px rgba(232, 85, 61, 0.2);
+  }
+}
+
+@keyframes glow-pulse-amber {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(227, 160, 8, 0);
+  }
+  50% {
+    box-shadow: 0 0 16px 2px rgba(227, 160, 8, 0.15);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+@keyframes ripple-out {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes expand-in {
+  0% {
+    max-height: 0;
+    opacity: 0;
+  }
+  100% {
+    max-height: 500px;
+    opacity: 1;
+  }
+}
+
+@keyframes collapse-out {
+  0% {
+    max-height: 500px;
+    opacity: 1;
+  }
+  100% {
+    max-height: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes number-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes stagger-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Skeleton shimmer base */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    var(--color-border-soft) 37%,
+    var(--color-surface) 63%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* Scrollbar styling for alerts */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-border-soft);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-mist);
 }

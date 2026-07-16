@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom'
 import { EyeIcon, EyeOffIcon, HeartRateIcon, OxygenIcon, TemperatureIcon, BloodPressureIcon } from '../components/icons'
 import ThemeToggle from '../components/ThemeToggle'
 
-// Small vital-sign glyphs drifting quietly through the background — a
-// different visual language from the dashboard's ECG strip on purpose.
 const floatingIcons = [
   { Icon: HeartRateIcon, left: '8%', delay: '0s', duration: '9s', size: 'h-5 w-5' },
   { Icon: OxygenIcon, left: '20%', delay: '3.2s', duration: '11s', size: 'h-4 w-4' },
@@ -13,15 +11,33 @@ const floatingIcons = [
   { Icon: HeartRateIcon, left: '73%', delay: '7s', duration: '8.5s', size: 'h-4 w-4' },
 ]
 
-function Login() {
+function Register() {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [role, setRole] = useState('patient')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [status, setStatus] = useState('')
+  const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setStatus('Connecting...')
+    setError('')
+
+    if (password !== confirmPassword) {
+      setError('Passwords don\'t match.')
+      return
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.')
+      return
+    }
+
+    // Not wired to the real /auth/register endpoint yet — matches Login's
+    // current stub state. Both get connected together once auth flow lands.
+    setStatus('Creating account...')
   }
 
   return (
@@ -54,9 +70,9 @@ function Login() {
       ))}
 
       <div className="w-full max-w-sm relative z-10" style={{ animation: 'fade-up 0.6s ease-out both' }}>
-        <div className="mb-8 flex flex-col gap-3">
+        <div className="mb-6 flex flex-col gap-3">
           <div className="flex items-center gap-3">
-            {/* Heartbeat mark with sonar rings — the auth pages' own signature detail */}
+            {/* Heartbeat mark with sonar rings — matches Login's signature detail */}
             <div className="relative h-9 w-9 flex items-center justify-center shrink-0">
               <span
                 className="absolute inset-0 rounded-full border border-signal/50"
@@ -83,7 +99,7 @@ function Login() {
               VitalWatch
             </h1>
           </div>
-          <p className="text-mist text-sm">Sign in to monitor your vitals</p>
+          <p className="text-mist text-sm">Create an account to start monitoring</p>
           <div className="flex items-center gap-2">
             <span
               className="inline-block h-1.5 w-1.5 rounded-full bg-signal"
@@ -93,8 +109,21 @@ function Login() {
           </div>
         </div>
 
-        <div className="bg-surface border border-border-soft rounded-2xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="bg-surface border border-border-soft rounded-2xl p-7">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-mist mb-2">
+                Full Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-ink border border-border-soft rounded-lg px-4 py-3 text-white focus:outline-none focus:border-signal transition-colors"
+                required
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-mist mb-2">
                 Email
@@ -110,40 +139,88 @@ function Login() {
 
             <div>
               <label className="block text-sm font-medium text-mist mb-2">
-                Password
+                I am a
               </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-ink border border-border-soft rounded-lg pl-4 pr-10 py-3 text-white focus:outline-none focus:border-signal transition-colors"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-mist hover:text-white transition-colors cursor-pointer"
-                >
-                  {showPassword ? <EyeOffIcon className="h-4.5 w-4.5" /> : <EyeIcon className="h-4.5 w-4.5" />}
-                </button>
+              <div className="flex gap-1 bg-ink border border-border-soft rounded-lg p-1">
+                {[
+                  { key: 'patient', label: 'Patient' },
+                  { key: 'caregiver', label: 'Caregiver' },
+                ].map((r) => (
+                  <button
+                    key={r.key}
+                    type="button"
+                    onClick={() => setRole(r.key)}
+                    className={`flex-1 text-sm py-2 rounded-md transition-colors cursor-pointer ${
+                      role === r.key ? 'bg-signal text-ink font-medium' : 'text-mist hover:text-white'
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
               </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-mist mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-ink border border-border-soft rounded-lg pl-4 pr-10 py-3 text-white focus:outline-none focus:border-signal transition-colors"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-mist hover:text-white transition-colors cursor-pointer"
+                  >
+                    {showPassword ? <EyeOffIcon className="h-4.5 w-4.5" /> : <EyeIcon className="h-4.5 w-4.5" />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-mist mb-2">
+                  Confirm
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirm ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full bg-ink border border-border-soft rounded-lg pl-4 pr-10 py-3 text-white focus:outline-none focus:border-signal transition-colors"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-mist hover:text-white transition-colors cursor-pointer"
+                  >
+                    {showConfirm ? <EyeOffIcon className="h-4.5 w-4.5" /> : <EyeIcon className="h-4.5 w-4.5" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {error && <p className="text-pulse text-sm">{error}</p>}
 
             <button
               type="submit"
               className="w-full bg-signal text-ink font-semibold py-3 rounded-lg hover:bg-signal/90 transition-colors"
             >
-              Sign In
+              Create Account
             </button>
 
             {status && <p className="text-mist text-sm text-center">{status}</p>}
           </form>
 
           <p className="text-center text-mist text-sm mt-6">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-signal hover:underline font-medium">
-              Sign up
+            Already have an account?{' '}
+            <Link to="/login" className="text-signal hover:underline font-medium">
+              Sign in
             </Link>
           </p>
         </div>
@@ -152,4 +229,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Register
