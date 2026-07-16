@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { client } from '../utils/api'
 import { EyeIcon, EyeOffIcon, HeartRateIcon, OxygenIcon, TemperatureIcon, BloodPressureIcon } from '../components/icons'
 import ThemeToggle from '../components/ThemeToggle'
 
@@ -17,11 +18,29 @@ function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [status, setStatus] = useState('')
+  const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setStatus('Connecting...')
+    setError('')
+    setStatus('')
+
+    try {
+      setStatus('Connecting...')
+      const { data } = await client.post('/auth/login', { email, password })
+      localStorage.setItem('vw_token', data.token)
+      localStorage.setItem('vw_user', JSON.stringify(data.user))
+      setStatus('Success! Redirecting...')
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 1000)
+    } catch (err) {
+      setStatus('')
+      setError(err.response?.data?.message || 'Invalid email or password.')
+    }
   }
 
   return (
@@ -129,6 +148,8 @@ function Login() {
                 </button>
               </div>
             </div>
+
+            {error && <p className="text-pulse text-sm text-center">{error}</p>}
 
             <button
               type="submit"

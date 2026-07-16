@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { client } from '../utils/api'
 import { EyeIcon, EyeOffIcon, HeartRateIcon, OxygenIcon, TemperatureIcon, BloodPressureIcon } from '../components/icons'
 import ThemeToggle from '../components/ThemeToggle'
 
@@ -22,9 +23,12 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
 
+  const navigate = useNavigate()
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setStatus('')
 
     if (password !== confirmPassword) {
       setError('Passwords don\'t match.')
@@ -35,9 +39,19 @@ function Register() {
       return
     }
 
-    // Not wired to the real /auth/register endpoint yet — matches Login's
-    // current stub state. Both get connected together once auth flow lands.
-    setStatus('Creating account...')
+    try {
+      setStatus('Creating account...')
+      const { data } = await client.post('/auth/register', { name, email, password, role })
+      localStorage.setItem('vw_token', data.token)
+      localStorage.setItem('vw_user', JSON.stringify(data.user))
+      setStatus('Success! Redirecting...')
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 1000)
+    } catch (err) {
+      setStatus('')
+      setError(err.response?.data?.message || 'Registration failed. Try again.')
+    }
   }
 
   return (

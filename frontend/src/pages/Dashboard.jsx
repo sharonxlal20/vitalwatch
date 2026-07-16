@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import EcgStripEnhanced from '../components/EcgStripEnhanced'
 import VitalCard from '../components/VitalCard'
 import VitalsChart from '../components/VitalsChart'
@@ -12,7 +13,8 @@ import { fetchLatestVitals, fetchVitalsHistory, fetchAlerts, logVital, acknowled
 import { mockLatestVitals, mockHistory, mockAlerts } from '../utils/mockData'
 import { timeAgo } from '../utils/format'
 
-const PATIENT_ID = 'demo-patient'
+const localUser = JSON.parse(localStorage.getItem('vw_user') || '{}')
+const PATIENT_ID = localUser.id || 'demo-patient'
 
 function vitalStatus(type, vitals) {
   if (!vitals) return 'normal'
@@ -36,6 +38,7 @@ function vitalStatus(type, vitals) {
 }
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const [latestVitals, setLatestVitals] = useState(null)
   const [alerts, setAlerts] = useState([])
   const [activeType, setActiveType] = useState('heartRate')
@@ -194,8 +197,16 @@ export default function Dashboard() {
             <ThemeToggle />
             
             <div className="flex items-center gap-2 border-l border-border-soft pl-5">
-              <span className="text-mist text-xs font-medium">Demo Patient</span>
-              <button className="text-mist hover:text-white transition-colors cursor-pointer p-1 hover:bg-border-soft/40 rounded-lg">
+              <span className="text-mist text-xs font-medium">{localUser.name || 'Demo Patient'}</span>
+              <button 
+                onClick={() => {
+                  localStorage.removeItem('vw_token')
+                  localStorage.removeItem('vw_user')
+                  navigate('/login')
+                }}
+                className="text-mist hover:text-white transition-colors cursor-pointer p-1 hover:bg-border-soft/40 rounded-lg"
+                title="Log Out"
+              >
                 <LogOutIcon className="h-4.5 w-4.5" />
               </button>
             </div>
