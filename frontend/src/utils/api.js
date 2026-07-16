@@ -8,9 +8,12 @@ import axios from 'axios'
 // response-shape mapping below; the components never talk to axios directly.
 // ---------------------------------------------------------------------------
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+let apiURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+if (apiURL && !apiURL.endsWith('/api') && !apiURL.endsWith('/api/')) {
+  apiURL = apiURL.replace(/\/$/, '') + '/api'
+}
 
-export const client = axios.create({ baseURL })
+export const client = axios.create({ baseURL: apiURL })
 
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('vw_token')
