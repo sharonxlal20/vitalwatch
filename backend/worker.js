@@ -12,7 +12,7 @@ const connection = new IORedis(process.env.REDIS_URL, {
 
 mongoose.connect(process.env.MONGO_URI);
 
-const ML_SERVICE_URL = 'http://127.0.0.1:8000/predict';
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://127.0.0.1:8000/predict';
 
 const worker = new Worker('anomaly-check', async (job) => {
   const { patientId, readingId } = job.data;

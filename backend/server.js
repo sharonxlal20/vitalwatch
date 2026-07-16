@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import './worker.js';
 
 import authRoutes from './routes/auth.js';
 import vitalsRoutes from './routes/vitals.js';
