@@ -16,6 +16,8 @@ function Register() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState('patient')
+  const [age, setAge] = useState('')
+  const [gender, setGender] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [status, setStatus] = useState('')
@@ -41,7 +43,7 @@ function Register() {
 
     try {
       setStatus('Creating account...')
-      const { data } = await client.post('/auth/register', { name, email, password, role })
+      const { data } = await client.post('/auth/register', { name, email, password, role, age: age ? Number(age) : undefined, gender: gender || undefined })
       localStorage.setItem('vw_token', data.token)
       localStorage.setItem('vw_user', JSON.stringify(data.user))
       setStatus('Success! Redirecting...')
@@ -171,6 +173,36 @@ function Register() {
                     {r.label}
                   </button>
                 ))}
+              </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-mist mb-2">
+                  Age
+                </label>
+                <input
+                  type="number"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  className="w-full bg-ink border border-border-soft rounded-lg px-4 py-3 text-white focus:outline-none focus:border-signal transition-colors"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-mist mb-2">
+                  Gender
+                </label>
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="w-full bg-ink border border-border-soft rounded-lg px-4 py-3 text-white focus:outline-none focus:border-signal transition-colors cursor-pointer"
+                  style={{ colorScheme: 'dark' }}
+                  required
+                >
+                  <option value="" disabled>Select</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
             </div>
 

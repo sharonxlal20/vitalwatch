@@ -232,7 +232,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-4">
             <span>Subject: <strong className="text-white">Demographics #0981</strong></span>
             <span className="h-3 w-px bg-border-soft" />
-            <span>Age/Sex: <strong className="text-white">42 / Male</strong></span>
+            <span>Age/Sex: <strong className="text-white">{localUser.age || '—'} / {localUser.gender || '—'}</strong></span>
             <span className="h-3 w-px bg-border-soft" />
             <span>Status: <span className="text-signal font-semibold">STABLE</span></span>
           </div>
