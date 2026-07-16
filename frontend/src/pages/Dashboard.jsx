@@ -13,9 +13,6 @@ import { fetchLatestVitals, fetchVitalsHistory, fetchAlerts, logVital, acknowled
 import { mockLatestVitals, mockHistory, mockAlerts } from '../utils/mockData'
 import { timeAgo } from '../utils/format'
 
-const localUser = JSON.parse(localStorage.getItem('vw_user') || '{}')
-const PATIENT_ID = localUser.id || 'demo-patient'
-
 function vitalStatus(type, vitals) {
   if (!vitals) return 'normal'
   if (type === 'heartRate') {
@@ -39,6 +36,16 @@ function vitalStatus(type, vitals) {
 
 export default function Dashboard() {
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = localStorage.getItem('vw_token')
+    if (!token) {
+      navigate('/login')
+    }
+  }, [navigate])
+
+  const localUser = JSON.parse(localStorage.getItem('vw_user') || '{}')
+  const PATIENT_ID = localUser.id || 'demo-patient'
   const [latestVitals, setLatestVitals] = useState(null)
   const [alerts, setAlerts] = useState([])
   const [activeType, setActiveType] = useState('heartRate')
@@ -77,7 +84,7 @@ export default function Dashboard() {
       // Small fake delay to appreciate the skeleton animations
       setTimeout(() => setLoading(false), 800)
     }
-  }, [])
+  }, [PATIENT_ID])
 
   useEffect(() => {
     loadCore()
@@ -108,7 +115,7 @@ export default function Dashboard() {
     return () => {
       cancelled = true
     }
-  }, [usingMock])
+  }, [usingMock, PATIENT_ID])
 
   const handleLogVital = async (payload) => {
     // Optimistic / mock updates
