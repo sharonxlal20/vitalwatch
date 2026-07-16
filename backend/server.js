@@ -15,6 +15,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/api/version', (req, res) => {
+  res.json({ version: 'v1.0.3', timestamp: '2026-07-16T17:46:00Z' });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/vitals', vitalsRoutes);
 app.use('/api/alerts', alertsRoutes);
