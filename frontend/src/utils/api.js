@@ -21,28 +21,93 @@ client.interceptors.request.use((config) => {
   return config
 })
 
-// GET /vitals/latest?patientId=  -> { heartRate, systolic, diastolic, spo2, temperature, updatedAt }
+// GET /vitals/:patientId -> extracts latest of each vital type
 export async function fetchLatestVitals(patientId) {
-  const { data } = await client.get('/vitals/latest', { params: { patientId } })
-  return data
+  const { data } = await client.get(`/vitals/${patientId}`)
+  const latest = {
+    heartRate: null,
+    systolic: null,
+    diastolic: null,
+    spo2: null,
+    temperature: null,
+    updatedAt: null
+  }
+  for (const r of data) {
+    if (r.type === 'heart_rate' && latest.heartRate === null) {
+      latest.heartRate = r.value
+      if (!latest.updatedAt) latest.updatedAt = r.recordedAt
+    }
+    if (r.type === 'bp' && latest.systolic === null) {
+      latest.systolic = r.value?.systolic
+      latest.diastolic = r.value?.diastolic
+      if (!latest.updatedAt) latest.updatedAt = r.recordedAt
+    }
+    if (r.type === 'spo2' && latest.spo2 === null) {
+      latest.spo2 = r.value
+      if (!latest.updatedAt) latest.updatedAt = r.recordedAt
+    }
+    if (r.type === 'temperature' && latest.temperature === null) {
+      latest.temperature = r.value
+      if (!latest.updatedAt) latest.updatedAt = r.recordedAt
+    }
+  }
+  return latest
 }
 
-// GET /vitals/history?patientId=&type=&range=  -> [{ recordedAt, value }]
+// GET /vitals/:patientId?type=...
 export async function fetchVitalsHistory(patientId, type, range = '24h') {
-  const { data } = await client.get('/vitals/history', { params: { patientId, type, range } })
-  return data
+  let backendType = type
+  if (type === 'heartRate') backendType = 'heart_rate'
+  if (type === 'bloodPressure') backendType = 'bp'
+
+  const { data } = await client.get(`/vitals/${patientId}`, { params: { type: backendType } })
+  
+  return data.map((r) => {
+    if (r.type === 'bp') {
+      return {
+        recordedAt: r.recordedAt,
+        systolic: r.value?.systolic,
+        diastolic: r.value?.diastolic
+      }
+    }
+    return {
+      recordedAt: r.recordedAt,
+      value: r.value
+    }
+  }).reverse()
 }
 
-// POST /vitals  -> { heartRate?, systolic?, diastolic?, spo2?, temperature?, patientId }
+// POST /vitals - split frontend multi-fields into individual requests
 export async function logVital(payload) {
-  const { data } = await client.post('/vitals', payload)
-  return data
+  const promises = []
+  if (payload.heartRate !== undefined) {
+    promises.push(client.post('/vitals', { type: 'heart_rate', value: Number(payload.heartRate) }))
+  }
+  if (payload.systolic !== undefined && payload.diastolic !== undefined) {
+    promises.push(client.post('/vitals', { type: 'bp', value: { systolic: Number(payload.systolic), diastolic: Number(payload.diastolic) } }))
+  }
+  if (payload.spo2 !== undefined) {
+    promises.push(client.post('/vitals', { type: 'spo2', value: Number(payload.spo2) }))
+  }
+  if (payload.temperature !== undefined) {
+    promises.push(client.post('/vitals', { type: 'temperature', value: Number(payload.temperature) }))
+  }
+  const results = await Promise.all(promises)
+  return results[0]?.data
 }
 
-// GET /alerts?patientId=&status=active  -> [{ id, vitalType, severity, message, value, createdAt, acknowledged }]
+// GET /alerts/:patientId
 export async function fetchAlerts(patientId) {
-  const { data } = await client.get('/alerts', { params: { patientId } })
-  return data
+  const { data } = await client.get(`/alerts/${patientId}`)
+  return data.map((a) => ({
+    id: a._id,
+    severity: a.severity,
+    message: a.message,
+    acknowledged: a.acknowledged,
+    createdAt: a.createdAt,
+    vitalType: a.message?.toLowerCase().includes('heart') ? 'Heart Rate' : 'Vitals',
+    value: ''
+  }))
 }
 
 // PATCH /alerts/:id/acknowledge
