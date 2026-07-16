@@ -40,6 +40,10 @@ function Register() {
       setError('Password must be at least 8 characters.')
       return
     }
+    if (age !== '' && (Number(age) < 0 || Number(age) > 120)) {
+      setError('Please enter a valid age between 0 and 120.')
+      return
+    }
 
     try {
       setStatus('Creating account...')
@@ -184,6 +188,8 @@ function Register() {
                   type="number"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
+                  min="0"
+                  max="120"
                   className="w-full bg-ink border border-border-soft rounded-lg px-4 py-3 text-white focus:outline-none focus:border-signal transition-colors"
                   required
                 />
